@@ -15,6 +15,9 @@ internal class Content
     // Terminal Nodes
     public static TerminalNode WhiteboardBuyTerminalNode;
 
+    // Canvas
+    public static GameObject WhiteboardEditorCanvasPrefab;
+
     public static void Load()
     {
         LoadAssetsFromAssetBundle();
@@ -37,6 +40,9 @@ internal class Content
 
             // Terminal Nodes
             WhiteboardBuyTerminalNode = assetBundle.LoadAsset<TerminalNode>("WhiteboardBuy");
+
+            // Canvas
+            WhiteboardEditorCanvasPrefab = assetBundle.LoadAsset<GameObject>("WhiteboardEditorCanvas");
 
             Plugin.logger.LogInfo("Successfully loaded assets from AssetBundle!");
         }

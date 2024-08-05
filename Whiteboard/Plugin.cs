@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
+using com.github.zehsteam.Whiteboard.MonoBehaviours;
 using com.github.zehsteam.Whiteboard.Patches;
 using HarmonyLib;
 using System.Reflection;
@@ -30,7 +31,11 @@ internal class Plugin : BaseUnityPlugin
 
         harmony.PatchAll(typeof(GameNetworkManagerPatch));
         harmony.PatchAll(typeof(StartOfRoundPatch));
+        harmony.PatchAll(typeof(HUDManagerPatch));
+        harmony.PatchAll(typeof(QuickMenuManagerPatch));
+        harmony.PatchAll(typeof(TerminalPatch));
         harmony.PatchAll(typeof(PlayerControllerBPatch));
+        harmony.PatchAll(typeof(ShipBuildModeManagerPatch));
 
         ConfigManager = new ConfigManager();
 
@@ -62,6 +67,15 @@ internal class Plugin : BaseUnityPlugin
     private void RegisterUnlockableItems()
     {
         UnlockableHelper.RegisterUnlockable(Content.WhiteboardUnlockableItemDef, LethalLib.Modules.StoreType.Decor, price: 200, Content.WhiteboardBuyTerminalNode);
+    }
+
+    public void SpawnWhiteboardEditorCanvas()
+    {
+        if (WhiteboardEditorBehaviour.Instance != null) return;
+
+        Object.Instantiate(Content.WhiteboardEditorCanvasPrefab);
+
+        logger.LogInfo("Spawned WhiteboardEditorCanvas.");
     }
 
     public void LogInfoExtended(object data)

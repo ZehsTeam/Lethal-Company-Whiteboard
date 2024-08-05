@@ -3,8 +3,6 @@
 
 #### This mod was inspired by a mod suggestion from [Takerst](https://www.twitch.tv/takerst).
 
-#### Use the [LethalConfig](https://thunderstore.io/c/lethal-company/p/AinaVT/LethalConfig/) mod to edit the whiteboard display text.
-
 #### The whiteboard display text supports [rich text tags](https://docs.unity3d.com/Packages/com.unity.textmeshpro@3.2/manual/RichText.html).
 
 ## <img src="https://i.imgur.com/TpnrFSH.png" width="20px"> Download
@@ -24,7 +22,7 @@ Download [Whiteboard](https://thunderstore.io/c/lethal-company/p/Zehs/Whiteboard
 | ----------- | ----------- | ----------- | ----------- |
 | `Price` | `Int32` | `200` | The price of the whiteboard in the store. |
 | `HostOnly` | `Boolean` | `false` | If enabled, only the host can edit the whiteboard. |
-| `DisplayText` | `String` | `- Dont leave the ship as last survivor\n- All in as long as more than 1 are alive\n- Teleport dead bodies` | The text that shows on the whiteboard. Supports rich text tags. |
+| `DefaultDisplayText` | `String` |  | The default display text that shows on the whiteboard. Supports rich text tags. |
 
 </details>
 

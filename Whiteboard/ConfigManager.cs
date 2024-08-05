@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace com.github.zehsteam.Whiteboard;
 
-internal class ConfigManager
+public class ConfigManager
 {
     // General Settings
     public ConfigEntry<bool> ExtendedLogging { get; private set; }
@@ -13,7 +13,7 @@ internal class ConfigManager
     // Whiteboard Settings
     public ConfigEntry<int> Price { get; private set; }
     public ConfigEntry<bool> HostOnly { get; private set; }
-    public ConfigEntry<string> DisplayText { get; private set; }
+    public ConfigEntry<string> DefaultDisplayText { get; private set; }
 
     public ConfigManager()
     {
@@ -32,13 +32,13 @@ internal class ConfigManager
         // Whiteboard Settings
         Price = configFile.Bind("Whiteboard Settings", "Price", defaultValue: 200, new ConfigDescription("The price of the whiteboard in the store.", new AcceptableValueRange<int>(0, 1000)));
         HostOnly = configFile.Bind("Whiteboard Settings", "HostOnly", defaultValue: false, "If enabled, only the host can edit the whiteboard.");
-        DisplayText = configFile.Bind("Whiteboard Settings", "DisplayText", defaultValue: "- Dont leave the ship as last survivor\n- All in as long as more than 1 are alive\n- Teleport dead bodies", "The text that shows on the whiteboard. Supports rich text tags.");
+        DefaultDisplayText = configFile.Bind("Whiteboard Settings", "DefaultDisplayText", defaultValue: "", "The default display text that shows on the whiteboard. Supports rich text tags.");
     }
 
     private void SetupChangedEvents()
     {
         Price.SettingChanged += Price_SettingChanged;
-        DisplayText.SettingChanged += DisplayText_SettingChanged;
+        HostOnly.SettingChanged += HostOnly_SettingChanged;
     }
 
     private void Price_SettingChanged(object sender, System.EventArgs e)
@@ -51,11 +51,14 @@ internal class ConfigManager
         }
     }
 
-    private void DisplayText_SettingChanged(object sender, System.EventArgs e)
+    private void HostOnly_SettingChanged(object sender, System.EventArgs e)
     {
-        if (WhiteboardBehaviour.Instance == null) return;
+        if (!Plugin.IsHostOrServer) return;
 
-        WhiteboardBehaviour.Instance.SetDisplayTextToConfigValue();
+        if (WhiteboardBehaviour.Instance != null)
+        {
+            WhiteboardBehaviour.Instance.IsHostOnly.Value = HostOnly.Value;
+        }
     }
 
     private void ClearUnusedEntries()

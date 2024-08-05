@@ -1,4 +1,5 @@
 ﻿using com.github.zehsteam.Whiteboard.MonoBehaviours;
+using GameNetcodeStuff;
 using HarmonyLib;
 using Unity.Netcode;
 using UnityEngine;
@@ -10,7 +11,7 @@ internal class StartOfRoundPatch
 {
     [HarmonyPatch(nameof(StartOfRound.Awake))]
     [HarmonyPostfix]
-    static void AwakePatch()
+    private static void AwakePatch()
     {
         SpawnNetworkHandler();
     }
@@ -36,5 +37,20 @@ internal class StartOfRoundPatch
         };
 
         PluginNetworkBehaviour.Instance.SetWhiteboardUnlockablePriceClientRpc(Plugin.ConfigManager.Price.Value, clientRpcParams);
+    }
+
+    [HarmonyPatch(nameof(StartOfRound.ReviveDeadPlayers))]
+    [HarmonyPostfix]
+    private static void ReviveDeadPlayersPatch()
+    {
+        if (WhiteboardEditorBehaviour.Instance == null) return;
+
+        if (WhiteboardEditorBehaviour.Instance.IsOpen)
+        {
+            PlayerControllerB playerScript = PlayerUtils.GetLocalPlayerScript();
+            if (playerScript == null) return;
+
+            playerScript.disableMoveInput = true;
+        }
     }
 }

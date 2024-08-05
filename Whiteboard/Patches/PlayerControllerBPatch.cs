@@ -18,4 +18,16 @@ internal class PlayerControllerBPatch
             WhiteboardBehaviour.Instance.SetWorldCanvasCamera();
         }
     }
+
+    [HarmonyPatch(nameof(PlayerControllerB.KillPlayer))]
+    [HarmonyPostfix]
+    private static void KillPlayerPatch()
+    {
+        if (WhiteboardEditorBehaviour.Instance == null) return;
+
+        if (WhiteboardEditorBehaviour.Instance.IsOpen)
+        {
+            WhiteboardEditorBehaviour.Instance.CloseEditorWindow();
+        }
+    }
 }

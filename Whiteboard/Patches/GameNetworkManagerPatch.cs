@@ -9,7 +9,7 @@ internal class GameNetworkManagerPatch
 {
     [HarmonyPatch(nameof(GameNetworkManager.Start))]
     [HarmonyPostfix]
-    static void StartPatch()
+    private static void StartPatch()
     {
         AddNetworkPrefabs();
     }
