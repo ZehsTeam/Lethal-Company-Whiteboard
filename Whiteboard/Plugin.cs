@@ -33,7 +33,6 @@ internal class Plugin : BaseUnityPlugin
         harmony.PatchAll(typeof(StartOfRoundPatch));
         harmony.PatchAll(typeof(HUDManagerPatch));
         harmony.PatchAll(typeof(QuickMenuManagerPatch));
-        harmony.PatchAll(typeof(TerminalPatch));
         harmony.PatchAll(typeof(PlayerControllerBPatch));
         harmony.PatchAll(typeof(ShipBuildModeManagerPatch));
 

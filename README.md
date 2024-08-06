@@ -20,7 +20,7 @@ Download [Whiteboard](https://thunderstore.io/c/lethal-company/p/Zehs/Whiteboard
 
 | Whiteboard Settings | Setting type | Default value | Description |
 | ----------- | ----------- | ----------- | ----------- |
-| `Price` | `Int32` | `200` | The price of the whiteboard in the store. |
+| `Price` | `Int32` | `150` | The price of the whiteboard in the store. |
 | `HostOnly` | `Boolean` | `false` | If enabled, only the host can edit the whiteboard. |
 | `DefaultDisplayText` | `String` |  | The default display text that shows on the whiteboard. Supports rich text tags. |
 

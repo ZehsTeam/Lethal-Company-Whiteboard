@@ -33,6 +33,14 @@ internal class PlayerUtils
         return GameNetworkManager.Instance.localPlayerController;
     }
 
+    public static bool IsLocalPlayerSpawned()
+    {
+        PlayerControllerB playerScript = GetLocalPlayerScript();
+        if (playerScript == null) return false;
+
+        return playerScript.IsSpawned;
+    }
+
     public static void SetControlsEnabled(bool value)
     {
         if (value)
@@ -56,6 +64,7 @@ internal class PlayerUtils
 
         try
         {
+            // PlayerControllerB
             playerScript.playerActions.Movement.Look.performed += playerScript.Look_performed;
             actions.FindAction("Jump").performed += playerScript.Jump_performed;
             actions.FindAction("Crouch").performed += playerScript.Crouch_performed;
@@ -71,6 +80,15 @@ internal class PlayerUtils
             actions.FindAction("SpeedCheat").performed += playerScript.SpeedCheat_performed;
             actions.FindAction("Emote1").performed += playerScript.Emote1_performed;
             actions.FindAction("Emote2").performed += playerScript.Emote2_performed;
+
+            playerScript.isTypingChat = false;
+
+            // HUDManager
+            actions.FindAction("EnableChat").performed += HUDManager.Instance.EnableChat_performed;
+            actions.FindAction("OpenMenu").performed += HUDManager.Instance.OpenMenu_performed;
+            actions.FindAction("SubmitChat").performed += HUDManager.Instance.SubmitChat_performed;
+            actions.FindAction("PingScan").performed += HUDManager.Instance.PingScan_performed;
+
             playerScript.playerActions.Movement.Enable();
         }
         catch (Exception e)
@@ -92,6 +110,7 @@ internal class PlayerUtils
 
         try
         {
+            // PlayerControllerB
             playerScript.playerActions.Movement.Look.performed -= playerScript.Look_performed;
             actions.FindAction("Jump").performed -= playerScript.Jump_performed;
             actions.FindAction("Crouch").performed -= playerScript.Crouch_performed;
@@ -107,6 +126,15 @@ internal class PlayerUtils
             actions.FindAction("SpeedCheat").performed -= playerScript.SpeedCheat_performed;
             actions.FindAction("Emote1").performed -= playerScript.Emote1_performed;
             actions.FindAction("Emote2").performed -= playerScript.Emote2_performed;
+
+            playerScript.isTypingChat = true;
+
+            // HUDManager
+            actions.FindAction("EnableChat").performed -= HUDManager.Instance.EnableChat_performed;
+            actions.FindAction("OpenMenu").performed -= HUDManager.Instance.OpenMenu_performed;
+            actions.FindAction("SubmitChat").performed -= HUDManager.Instance.SubmitChat_performed;
+            actions.FindAction("PingScan").performed -= HUDManager.Instance.PingScan_performed;
+
             playerScript.playerActions.Movement.Disable();
         }
         catch (Exception e)

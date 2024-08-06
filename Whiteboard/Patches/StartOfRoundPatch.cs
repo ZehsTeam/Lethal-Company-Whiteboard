@@ -24,6 +24,13 @@ internal class StartOfRoundPatch
         networkHandlerHost.GetComponent<NetworkObject>().Spawn();
     }
 
+    [HarmonyPatch(nameof(StartOfRound.Start))]
+    [HarmonyPostfix]
+    private static void StartPatch()
+    {
+        UnlockableHelper.UpdateUnlockablePrice(Content.WhiteboardUnlockableItemDef, Plugin.ConfigManager.Price.Value);
+    }
+
     [HarmonyPatch(nameof(StartOfRound.OnClientConnect))]
     [HarmonyPrefix]
     private static void OnClientConnectPatch(ref ulong clientId)

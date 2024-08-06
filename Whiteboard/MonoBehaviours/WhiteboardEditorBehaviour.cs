@@ -14,8 +14,8 @@ public class WhiteboardEditorBehaviour : MonoBehaviour
     public GameObject HostOnlyObject = null;
     public Button HostOnlyButton = null;
     public GameObject HostOnlyCheckedObject = null;
-    
-    public TMP_InputField TextColorInputField = null;
+
+    public Image TextColorPreviewImage = null;
     public TMP_Dropdown FontSizeDropdown = null;
     public TMP_Dropdown FontStyleDropdown = null;
     public TMP_Dropdown FontFamilyDropdown = null;
@@ -23,8 +23,10 @@ public class WhiteboardEditorBehaviour : MonoBehaviour
     public TMP_Dropdown VerticalAlignmentDropdown = null;
 
     public const int DefaultFontSizeIndex = 7; // 0.12
+    public const string DefaultTextHexColor = "#000000";
 
     public bool IsOpen { get; private set; }
+    public string TextHexColor { get; private set; }
 
     private void Awake()
     {
@@ -33,10 +35,12 @@ public class WhiteboardEditorBehaviour : MonoBehaviour
 
     private void Start()
     {
-        CloseEditorWindow();
+        CloseWindow();
+
+        TextHexColor = DefaultTextHexColor;
     }
 
-    public void OpenEditorWindow()
+    public void OpenWindow()
     {
         if (WhiteboardBehaviour.Instance == null)
         {
@@ -60,15 +64,20 @@ public class WhiteboardEditorBehaviour : MonoBehaviour
         PlayerUtils.SetControlsEnabled(false);
     }
 
-    public void CloseEditorWindow()
+    public void CloseWindow()
     {
+        if (ColorPickerBehaviour.Instance.IsOpen)
+        {
+            ColorPickerBehaviour.Instance.CloseWindow();
+        }
+
         IsOpen = false;
         EditorWindowObject.SetActive(false);
         Utils.SetCursorLockState(true);
         PlayerUtils.SetControlsEnabled(true);
     }
 
-    public void OnConfirm()
+    public void OnConfirmButtonClicked()
     {
         if (WhiteboardBehaviour.Instance == null)
         {
@@ -78,25 +87,32 @@ public class WhiteboardEditorBehaviour : MonoBehaviour
 
         WhiteboardBehaviour.Instance.SetData(GetDataFromUI());
 
-        CloseEditorWindow();
+        CloseWindow();
     }
 
-    public void OnCancel()
+    public void OnCancelButtonClicked()
     {
-        CloseEditorWindow();
+        CloseWindow();
     }
 
-    public void OnReset()
+    public void OnResetButtonClicked()
     {
         SetDataToUI(new WhiteboardData());
     }
 
-    public void OnHostOnly()
+    public void OnHostOnlyButtonClicked()
     {
         if (!Plugin.IsHostOrServer) return;
 
         Plugin.ConfigManager.HostOnly.Value = !Plugin.ConfigManager.HostOnly.Value;
         UpdateHostOnlyCheckbox();
+    }
+
+    public void OnColorPickerButtonClicked()
+    {
+        if (ColorPickerBehaviour.Instance == null) return;
+
+        ColorPickerBehaviour.Instance.OpenWindow();
     }
 
     private void UpdateHostOnlyCheckbox()
@@ -107,24 +123,52 @@ public class WhiteboardEditorBehaviour : MonoBehaviour
     private WhiteboardData GetDataFromUI()
     {
         string displayText = DisplayTextInputField.text;
-        string textColor = TextColorInputField.text;
+        string textHexColor = TextHexColor;
         int fontSizeIndex = FontSizeDropdown.value;
         int fontStyleIndex = FontStyleDropdown.value;
         int fontFamilyIndex = FontFamilyDropdown.value;
         int horizontalAlignmentIndex = HorizontalAlignmentDropdown.value;
         int verticalAlignmentIndex = VerticalAlignmentDropdown.value;
 
-        return new WhiteboardData(displayText, textColor, fontSizeIndex, fontStyleIndex, fontFamilyIndex, horizontalAlignmentIndex, verticalAlignmentIndex);
+        return new WhiteboardData(displayText, textHexColor, fontSizeIndex, fontStyleIndex, fontFamilyIndex, horizontalAlignmentIndex, verticalAlignmentIndex);
     }
 
     private void SetDataToUI(WhiteboardData data)
     {
-        DisplayTextInputField.text = data.DisplayText;
-        TextColorInputField.text = data.TextColor;
-        FontSizeDropdown.value = data.FontSizeIndex;
-        FontStyleDropdown.value = data.FontStyleIndex;
-        FontFamilyDropdown.value = data.FontFamilyIndex;
-        HorizontalAlignmentDropdown.value = data.HorizontalAlignmentIndex;
-        VerticalAlignmentDropdown.value = data.VerticalAlignmentIndex;
+        if (data == null)
+        {
+            Plugin.logger.LogWarning("WhiteboardData is null in WhiteboardEditorBehaviour.SetDataToUI(); Setting WhiteboardData to default.");
+
+            data = new WhiteboardData();
+        }
+
+        try
+        {
+            DisplayTextInputField.text = data.DisplayText;
+            SetTextHexColor(data.TextHexColor);
+            FontSizeDropdown.value = data.FontSizeIndex;
+            FontStyleDropdown.value = data.FontStyleIndex;
+            FontFamilyDropdown.value = data.FontFamilyIndex;
+            HorizontalAlignmentDropdown.value = data.HorizontalAlignmentIndex;
+            VerticalAlignmentDropdown.value = data.VerticalAlignmentIndex;
+        }
+        catch (System.Exception e)
+        {
+            Plugin.logger.LogError($"Failed to set whiteboard editor ui data.\n\n{e}");
+        }
+    }
+
+    private void UpdateTextColorPreview()
+    {
+        if (ColorUtility.TryParseHtmlString(TextHexColor, out Color color))
+        {
+            TextColorPreviewImage.color = color;
+        }
+    }
+
+    public void SetTextHexColor(string newTextColorHex)
+    {
+        TextHexColor = newTextColorHex;
+        UpdateTextColorPreview();
     }
 }

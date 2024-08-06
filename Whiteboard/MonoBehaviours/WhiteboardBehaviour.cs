@@ -24,11 +24,16 @@ public class WhiteboardBehaviour : NetworkBehaviour
     private void Awake()
     {
         if (Instance == null) Instance = this;
+
+        Data = new WhiteboardData();
     }
 
     private void Start()
     {
-        SetWorldCanvasCamera();
+        if (PlayerUtils.IsLocalPlayerSpawned())
+        {
+            SetWorldCanvasCamera();
+        }
 
         if (Plugin.IsHostOrServer)
         {
@@ -62,7 +67,7 @@ public class WhiteboardBehaviour : NetworkBehaviour
 
         if (WhiteboardEditorBehaviour.Instance.IsOpen)
         {
-            WhiteboardEditorBehaviour.Instance.CloseEditorWindow();
+            WhiteboardEditorBehaviour.Instance.CloseWindow();
         }
     }
 
@@ -81,7 +86,7 @@ public class WhiteboardBehaviour : NetworkBehaviour
             return;
         }
 
-        WhiteboardEditorBehaviour.Instance.OpenEditorWindow();
+        WhiteboardEditorBehaviour.Instance.OpenWindow();
     }
 
     public void SetWorldCanvasCamera()
@@ -104,14 +109,14 @@ public class WhiteboardBehaviour : NetworkBehaviour
         if (!Plugin.IsHostOrServer) return;
 
         string displayText = Utils.LoadFromCurrentSaveFile("Whiteboard_DisplayText", defaultValue: Plugin.ConfigManager.DefaultDisplayText.Value);
-        string textColor = Utils.LoadFromCurrentSaveFile("Whiteboard_TextColor", defaultValue: "");
+        string textHexColor = Utils.LoadFromCurrentSaveFile("Whiteboard_TextHexColor", defaultValue: WhiteboardEditorBehaviour.DefaultTextHexColor);
         int fontSizeIndex = Utils.LoadFromCurrentSaveFile("Whiteboard_FontSizeIndex", defaultValue: WhiteboardEditorBehaviour.DefaultFontSizeIndex);
         int fontStyleIndex = Utils.LoadFromCurrentSaveFile("Whiteboard_FontStyleIndex", defaultValue: 0);
         int fontFamilyIndex = Utils.LoadFromCurrentSaveFile("Whiteboard_FontFamilyIndex", defaultValue: 0);
         int horizontalAlignmentIndex = Utils.LoadFromCurrentSaveFile("Whiteboard_HorizontalAlignmentIndex", defaultValue: 0);
         int verticalAlignmentIndex = Utils.LoadFromCurrentSaveFile("Whiteboard_VerticalAlignmentIndex", defaultValue: 0);
 
-        SetData(new WhiteboardData(displayText, textColor, fontSizeIndex, fontStyleIndex, fontFamilyIndex, horizontalAlignmentIndex, verticalAlignmentIndex));
+        SetData(new WhiteboardData(displayText, textHexColor, fontSizeIndex, fontStyleIndex, fontFamilyIndex, horizontalAlignmentIndex, verticalAlignmentIndex));
     }
 
     private void SaveData()
@@ -119,7 +124,7 @@ public class WhiteboardBehaviour : NetworkBehaviour
         if (!Plugin.IsHostOrServer) return;
 
         Utils.SaveToCurrentSaveFile("Whiteboard_DisplayText", Data.DisplayText);
-        Utils.SaveToCurrentSaveFile("Whiteboard_TextColor", Data.TextColor);
+        Utils.SaveToCurrentSaveFile("Whiteboard_TextHexColor", Data.TextHexColor);
         Utils.SaveToCurrentSaveFile("Whiteboard_FontSizeIndex", Data.FontSizeIndex);
         Utils.SaveToCurrentSaveFile("Whiteboard_FontStyleIndex", Data.FontStyleIndex);
         Utils.SaveToCurrentSaveFile("Whiteboard_FontFamilyIndex", Data.FontFamilyIndex);
@@ -196,7 +201,7 @@ public class WhiteboardBehaviour : NetworkBehaviour
         UpdateWorldCanvas();
         LogData();
     }
-
+    
     #region WorldCanvas
     private void UpdateWorldCanvas()
     {
@@ -205,27 +210,22 @@ public class WhiteboardBehaviour : NetworkBehaviour
 
     private void UpdateWhiteboardText()
     {
+        if (Data == null)
+        {
+            Plugin.logger.LogWarning("WhiteboardData is null in WhiteboardBehaviour.UpdateWhiteboardText(); Setting WhiteboardData to default.");
+
+            Data = new WhiteboardData();
+        }
+
         string displayText = string.Empty;
 
-        string[] colorNames = ["black", "blue", "green", "orange", "purple", "red", "white", "yellow"];
-
-        if (!string.IsNullOrWhiteSpace(Data.TextColor))
+        if (Data.TextHexColor.StartsWith("#"))
         {
-            if (Utils.ArrayContains(colorNames, Data.TextColor))
-            {
-                displayText += $"<color=\"{Data.TextColor}\">";
-            }
-            else
-            {
-                if (Data.TextColor.StartsWith("#"))
-                {
-                    displayText += $"<color={Data.TextColor}>";
-                }
-                else
-                {
-                    displayText += $"<color=#{Data.TextColor}>";
-                }
-            }
+            displayText += $"<color={Data.TextHexColor}>";
+        }
+        else
+        {
+            displayText += $"<color=#{Data.TextHexColor}>";
         }
 
         displayText += Data.DisplayText;
@@ -241,31 +241,21 @@ public class WhiteboardBehaviour : NetworkBehaviour
         WhiteboardText.fontStyle = FontStyleArray[Data.FontStyleIndex];
         WhiteboardText.font = FontAssetArray[Data.FontFamilyIndex];
 
-        switch (Data.HorizontalAlignmentIndex)
+        WhiteboardText.horizontalAlignment = Data.HorizontalAlignmentIndex switch
         {
-            case 0:
-                WhiteboardText.horizontalAlignment = HorizontalAlignmentOptions.Left;
-                break;
-            case 1:
-                WhiteboardText.horizontalAlignment = HorizontalAlignmentOptions.Center;
-                break;
-            case 2:
-                WhiteboardText.horizontalAlignment = HorizontalAlignmentOptions.Right;
-                break;
-        }
+            0 => HorizontalAlignmentOptions.Left,
+            1 => HorizontalAlignmentOptions.Center,
+            2 => HorizontalAlignmentOptions.Right,
+            _ => HorizontalAlignmentOptions.Left,
+        };
 
-        switch (Data.VerticalAlignmentIndex)
+        WhiteboardText.verticalAlignment = Data.VerticalAlignmentIndex switch
         {
-            case 0:
-                WhiteboardText.verticalAlignment = VerticalAlignmentOptions.Top;
-                break;
-            case 1:
-                WhiteboardText.verticalAlignment = VerticalAlignmentOptions.Middle;
-                break;
-            case 2:
-                WhiteboardText.verticalAlignment = VerticalAlignmentOptions.Bottom;
-                break;
-        }
+            0 => VerticalAlignmentOptions.Top,
+            1 => VerticalAlignmentOptions.Middle,
+            2 => VerticalAlignmentOptions.Bottom,
+            _ => VerticalAlignmentOptions.Top,
+        };
     }
     #endregion
 
@@ -274,7 +264,7 @@ public class WhiteboardBehaviour : NetworkBehaviour
         string message = string.Empty;
 
         message += $"DisplayText: \n\"{Data.DisplayText}\"\n\n";
-        message += $"TextColor: \"{Data.TextColor}\"\n";
+        message += $"TextHexColor: \"{Data.TextHexColor}\"\n";
         message += $"FontSizeIndex: {Data.FontSizeIndex}\n";
         message += $"FontStyleIndex: {Data.FontStyleIndex}\n";
         message += $"FontFamilyIndex: {Data.FontFamilyIndex}\n";
