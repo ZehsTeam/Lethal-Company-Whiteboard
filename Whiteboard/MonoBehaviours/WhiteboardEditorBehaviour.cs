@@ -25,7 +25,7 @@ public class WhiteboardEditorBehaviour : MonoBehaviour
     public const int DefaultFontSizeIndex = 7; // 0.12
     public const string DefaultTextHexColor = "#000000";
 
-    public bool IsOpen { get; private set; }
+    public bool IsWindowOpen { get; private set; }
     public string TextHexColor { get; private set; }
 
     private void Awake()
@@ -48,7 +48,7 @@ public class WhiteboardEditorBehaviour : MonoBehaviour
             return;
         }
 
-        if (Utils.IsQuickMenuOpen() || IsOpen) return;
+        if (Utils.IsQuickMenuOpen() || IsWindowOpen) return;
 
         HostOnlyObject.SetActive(Plugin.IsHostOrServer);
 
@@ -57,7 +57,7 @@ public class WhiteboardEditorBehaviour : MonoBehaviour
             UpdateHostOnlyCheckbox();
         }
 
-        IsOpen = true;
+        IsWindowOpen = true;
         EditorWindowObject.SetActive(true);
         SetDataToUI(WhiteboardBehaviour.Instance.Data);
         Utils.SetCursorLockState(false);
@@ -66,12 +66,12 @@ public class WhiteboardEditorBehaviour : MonoBehaviour
 
     public void CloseWindow()
     {
-        if (ColorPickerBehaviour.Instance.IsOpen)
+        if (ColorPickerBehaviour.Instance.IsWindowOpen)
         {
             ColorPickerBehaviour.Instance.CloseWindow();
         }
 
-        IsOpen = false;
+        IsWindowOpen = false;
         EditorWindowObject.SetActive(false);
         Utils.SetCursorLockState(true);
         PlayerUtils.SetControlsEnabled(true);

@@ -12,7 +12,7 @@ internal class ShipBuildModeManagerPatch
     {
         if (WhiteboardEditorBehaviour.Instance == null) return;
 
-        if (WhiteboardEditorBehaviour.Instance.IsOpen)
+        if (WhiteboardEditorBehaviour.Instance.IsWindowOpen)
         {
             __result = false;
         }

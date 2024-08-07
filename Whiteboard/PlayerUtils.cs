@@ -8,7 +8,10 @@ internal class PlayerUtils
 {
     public static int GetLocalPlayerId()
     {
-        return (int)GetLocalPlayerScript().playerClientId;
+        PlayerControllerB playerScript = GetLocalPlayerScript();
+        if (playerScript == null) return -1;
+
+        return (int)playerScript.playerClientId;
     }
 
     public static bool IsLocalPlayerId(int playerId)
@@ -85,7 +88,7 @@ internal class PlayerUtils
 
             // HUDManager
             actions.FindAction("EnableChat").performed += HUDManager.Instance.EnableChat_performed;
-            actions.FindAction("OpenMenu").performed += HUDManager.Instance.OpenMenu_performed;
+            //actions.FindAction("OpenMenu").performed += HUDManager.Instance.OpenMenu_performed;
             actions.FindAction("SubmitChat").performed += HUDManager.Instance.SubmitChat_performed;
             actions.FindAction("PingScan").performed += HUDManager.Instance.PingScan_performed;
 
@@ -131,7 +134,7 @@ internal class PlayerUtils
 
             // HUDManager
             actions.FindAction("EnableChat").performed -= HUDManager.Instance.EnableChat_performed;
-            actions.FindAction("OpenMenu").performed -= HUDManager.Instance.OpenMenu_performed;
+            //actions.FindAction("OpenMenu").performed -= HUDManager.Instance.OpenMenu_performed;
             actions.FindAction("SubmitChat").performed -= HUDManager.Instance.SubmitChat_performed;
             actions.FindAction("PingScan").performed -= HUDManager.Instance.PingScan_performed;
 

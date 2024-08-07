@@ -25,7 +25,7 @@ internal class PlayerControllerBPatch
     {
         if (WhiteboardEditorBehaviour.Instance == null) return;
 
-        if (WhiteboardEditorBehaviour.Instance.IsOpen)
+        if (WhiteboardEditorBehaviour.Instance.IsWindowOpen)
         {
             WhiteboardEditorBehaviour.Instance.CloseWindow();
         }

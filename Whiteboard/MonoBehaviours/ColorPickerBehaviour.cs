@@ -9,7 +9,7 @@ public class ColorPickerBehaviour : MonoBehaviour
     public GameObject ColorPickerWindowObject = null;
     public ColorPickerControlBehaviour ColorPickerControlBehaviour = null;
 
-    public bool IsOpen {  get; private set; }
+    public bool IsWindowOpen {  get; private set; }
 
     private void Awake()
     {
@@ -23,16 +23,16 @@ public class ColorPickerBehaviour : MonoBehaviour
 
     public void OpenWindow()
     {
-        if (!WhiteboardEditorBehaviour.Instance.IsOpen || IsOpen) return;
+        if (!WhiteboardEditorBehaviour.Instance.IsWindowOpen || IsWindowOpen) return;
 
-        IsOpen = true;
-        ColorPickerControlBehaviour.SetHexColorInputField(WhiteboardEditorBehaviour.Instance.TextHexColor, updateColorPicker: true);
+        IsWindowOpen = true;
         ColorPickerWindowObject.SetActive(true);
+        ColorPickerControlBehaviour.SetColor(WhiteboardEditorBehaviour.Instance.TextHexColor);
     }
 
     public void CloseWindow()
     {
-        IsOpen = false;
+        IsWindowOpen = false;
         ColorPickerWindowObject.SetActive(false);
     }
 

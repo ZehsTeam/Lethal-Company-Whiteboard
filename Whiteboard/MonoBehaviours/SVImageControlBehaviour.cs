@@ -19,7 +19,7 @@ public class SVImageControlBehaviour : MonoBehaviour, IDragHandler, IPointerClic
         _rectTransform = GetComponent<RectTransform>();
 
         _pickerTransform = _pickerImage.GetComponent<RectTransform>();
-        _pickerTransform.position = new Vector2(-(_rectTransform.sizeDelta.x * 0.5f), -(_rectTransform.sizeDelta.y * 0.5f));
+        _pickerTransform.localPosition = new Vector2(-(_rectTransform.sizeDelta.x * 0.5f), -(_rectTransform.sizeDelta.y * 0.5f));
     }
 
     private void UpdateColor(PointerEventData eventData)
@@ -52,5 +52,16 @@ public class SVImageControlBehaviour : MonoBehaviour, IDragHandler, IPointerClic
     public void OnPointerClick(PointerEventData eventData)
     {
         UpdateColor(eventData);
+    }
+
+    public void SetPickerLocation(float saturation, float value)
+    {
+        float x = saturation * _rectTransform.sizeDelta.x - (_rectTransform.sizeDelta.x * 0.5f);
+        float y = value * _rectTransform.sizeDelta.y - (_rectTransform.sizeDelta.y * 0.5f);
+
+        _pickerTransform.localPosition = new Vector2(x, y);
+        _pickerImage.color = Color.HSVToRGB(0, 0, 1 - value);
+
+        Plugin.Instance.LogInfoExtended($"SetPickerLocation (saturation: {saturation}, value: {value}), (x: {x}, y: {y})");
     }
 }

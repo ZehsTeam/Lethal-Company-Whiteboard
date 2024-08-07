@@ -32,7 +32,6 @@ internal class Plugin : BaseUnityPlugin
         harmony.PatchAll(typeof(GameNetworkManagerPatch));
         harmony.PatchAll(typeof(StartOfRoundPatch));
         harmony.PatchAll(typeof(HUDManagerPatch));
-        harmony.PatchAll(typeof(QuickMenuManagerPatch));
         harmony.PatchAll(typeof(PlayerControllerBPatch));
         harmony.PatchAll(typeof(ShipBuildModeManagerPatch));
 
@@ -65,7 +64,7 @@ internal class Plugin : BaseUnityPlugin
 
     private void RegisterUnlockableItems()
     {
-        UnlockableHelper.RegisterUnlockable(Content.WhiteboardUnlockableItemDef, LethalLib.Modules.StoreType.Decor, price: 200, Content.WhiteboardBuyTerminalNode);
+        UnlockableHelper.RegisterUnlockable(Content.WhiteboardUnlockableItemDef, LethalLib.Modules.StoreType.Decor, price: ConfigManager.Price.Value, Content.WhiteboardBuyTerminalNode);
     }
 
     public void SpawnWhiteboardEditorCanvas()

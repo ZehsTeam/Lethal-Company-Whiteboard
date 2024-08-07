@@ -65,7 +65,7 @@ public class WhiteboardBehaviour : NetworkBehaviour
 
         if (WhiteboardEditorBehaviour.Instance == null) return;
 
-        if (WhiteboardEditorBehaviour.Instance.IsOpen)
+        if (WhiteboardEditorBehaviour.Instance.IsWindowOpen)
         {
             WhiteboardEditorBehaviour.Instance.CloseWindow();
         }
@@ -134,30 +134,29 @@ public class WhiteboardBehaviour : NetworkBehaviour
 
     public void SetData(WhiteboardData data)
     {
-        SetDataServerRpc(data, PlayerUtils.GetLocalPlayerId());
+        SetDataServerRpc(data, NetworkUtils.GetLocalClientId());
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SetDataServerRpc(WhiteboardData data, int fromPlayerId)
+    public void SetDataServerRpc(WhiteboardData data, int fromClientId)
     {
-        PlayerControllerB playerScript = PlayerUtils.GetPlayerScript(fromPlayerId);
-        if (playerScript == null) return;
-
-        if (!playerScript.isHostPlayerObject)
+        if (fromClientId == NetworkUtils.GetLocalClientId())
         {
-            if (Plugin.ConfigManager.HostOnly.Value)
-            {
-                Plugin.logger.LogWarning($"Player \"{playerScript.playerUsername}\" tried to edit the whiteboard while HostOnly mode is enabled.");
-                return;
-            }
-
-            Plugin.Instance.LogInfoExtended($"Player \"{playerScript.playerUsername}\" set the whiteboard data. Display text: \"{data.DisplayText}\".");
+            // Host
+            Plugin.Instance.LogInfoExtended($"Set the whiteboard data. Display text: \"{data.DisplayText}\".");
         }
         else
         {
-            Plugin.Instance.LogInfoExtended($"Set the whiteboard data. Display text: \"{data.DisplayText}\".");
+            // Client
+            if (Plugin.ConfigManager.HostOnly.Value)
+            {
+                Plugin.logger.LogWarning($"Client #{fromClientId} tried to edit the whiteboard while HostOnly mode is enabled.");
+                return;
+            }
+
+            Plugin.Instance.LogInfoExtended($"Client #{fromClientId} set the whiteboard data. Display text: \"{data.DisplayText}\".");
         }
-        
+
         SetDataClientRpc(data);
         SetDataOnLocalClient(data);
     }
@@ -173,7 +172,7 @@ public class WhiteboardBehaviour : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void RequestDataServerRpc(int toClientId)
     {
-        Plugin.Instance.LogInfoExtended($"Recieved request for whiteboard data from client: {toClientId}");
+        Plugin.Instance.LogInfoExtended($"Recieved request for whiteboard data from client #{toClientId}");
 
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {

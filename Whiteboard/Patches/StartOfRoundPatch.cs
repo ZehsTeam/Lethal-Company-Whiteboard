@@ -24,13 +24,6 @@ internal class StartOfRoundPatch
         networkHandlerHost.GetComponent<NetworkObject>().Spawn();
     }
 
-    [HarmonyPatch(nameof(StartOfRound.Start))]
-    [HarmonyPostfix]
-    private static void StartPatch()
-    {
-        UnlockableHelper.UpdateUnlockablePrice(Content.WhiteboardUnlockableItemDef, Plugin.ConfigManager.Price.Value);
-    }
-
     [HarmonyPatch(nameof(StartOfRound.OnClientConnect))]
     [HarmonyPrefix]
     private static void OnClientConnectPatch(ref ulong clientId)
@@ -52,7 +45,7 @@ internal class StartOfRoundPatch
     {
         if (WhiteboardEditorBehaviour.Instance == null) return;
 
-        if (WhiteboardEditorBehaviour.Instance.IsOpen)
+        if (WhiteboardEditorBehaviour.Instance.IsWindowOpen)
         {
             PlayerControllerB playerScript = PlayerUtils.GetLocalPlayerScript();
             if (playerScript == null) return;

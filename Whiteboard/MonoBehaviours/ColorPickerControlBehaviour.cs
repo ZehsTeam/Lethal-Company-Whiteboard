@@ -18,6 +18,9 @@ public class ColorPickerControlBehaviour : MonoBehaviour
     [SerializeField]
     private TMP_InputField _hexColorInputField = null;
 
+    [SerializeField]
+    private SVImageControlBehaviour _svImageControlBehaviour = null;
+
     private Texture2D _hueTexture, _satValTexture, _outputTexture = null;
 
     private bool _updatedHexColorInputFieldInternally = false;
@@ -97,8 +100,6 @@ public class ColorPickerControlBehaviour : MonoBehaviour
 
     private void UpdateOutputImage()
     {
-        Initialize();
-
         Color currentColor = Color.HSVToRGB(_currentHue, _currentSat, _currentVal);
 
         for (int i = 0; i < _outputTexture.height; i++)
@@ -108,7 +109,8 @@ public class ColorPickerControlBehaviour : MonoBehaviour
 
         _outputTexture.Apply();
 
-        SetHexColorInputField(GetHexColor());
+        _updatedHexColorInputFieldInternally = true;
+        _hexColorInputField.text = GetHexColor();
     }
 
     public void SetSatVal(float saturation, float value)
@@ -121,8 +123,6 @@ public class ColorPickerControlBehaviour : MonoBehaviour
 
     public void UpdateSatValImage()
     {
-        Initialize();
-
         _currentHue = _hueSlider.value;
 
         for (int y = 0; y < _satValTexture.height; y++)
@@ -159,6 +159,11 @@ public class ColorPickerControlBehaviour : MonoBehaviour
             hexColor = $"#{_hexColorInputField.text}";
         }
 
+        UpdateColor(hexColor);
+    }
+
+    private void UpdateColor(string hexColor)
+    {
         if (ColorUtility.TryParseHtmlString(hexColor, out Color newColor))
         {
             Color.RGBToHSV(newColor, out _currentHue, out _currentSat, out _currentVal);
@@ -166,15 +171,19 @@ public class ColorPickerControlBehaviour : MonoBehaviour
             _hueSlider.value = _currentHue;
 
             UpdateOutputImage();
+
+            _svImageControlBehaviour.SetPickerLocation(_currentSat, _currentVal);
         }
     }
 
-    public void SetHexColorInputField(string hexColor, bool updateColorPicker = false)
+    public void SetColor(string hexColor)
     {
         Initialize();
 
-        _updatedHexColorInputFieldInternally = !updateColorPicker;
+        _updatedHexColorInputFieldInternally = true;
         _hexColorInputField.text = hexColor;
+
+        UpdateColor(hexColor);
     }
 
     public string GetHexColor()
