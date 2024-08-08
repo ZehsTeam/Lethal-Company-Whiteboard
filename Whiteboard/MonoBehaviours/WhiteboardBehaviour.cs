@@ -15,6 +15,7 @@ public class WhiteboardBehaviour : NetworkBehaviour
     public float[] FontSizeArray = [];
     public FontStyles[] FontStyleArray = [];
     public TMP_FontAsset[] FontAssetArray = [];
+    public SpriteSheetData TakerstEmotesData = null;
 
     [HideInInspector]
     public NetworkVariable<bool> IsHostOnly = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -218,16 +219,12 @@ public class WhiteboardBehaviour : NetworkBehaviour
 
         string displayText = string.Empty;
 
-        if (Data.TextHexColor.StartsWith("#"))
+        if (!string.IsNullOrWhiteSpace(Data.TextHexColor))
         {
             displayText += $"<color={Data.TextHexColor}>";
         }
-        else
-        {
-            displayText += $"<color=#{Data.TextHexColor}>";
-        }
 
-        displayText += Data.DisplayText;
+        displayText += TakerstEmotesData.GetParsedText(Data.DisplayText);
 
         // If using the Signal Translator font, make all the text lowercase.
         if (Data.FontFamilyIndex == 2)
