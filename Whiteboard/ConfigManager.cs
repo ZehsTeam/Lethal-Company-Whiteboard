@@ -30,7 +30,7 @@ public class ConfigManager
         ExtendedLogging = configFile.Bind("General Settings", "ExtendedLogging", defaultValue: false, "Enable extended logging.");
 
         // Whiteboard Settings
-        Price = configFile.Bind("Whiteboard Settings", "Price", defaultValue: 150, new ConfigDescription("The price of the whiteboard in the store.", new AcceptableValueRange<int>(0, 1000)));
+        Price = configFile.Bind("Whiteboard Settings", "Price", defaultValue: 100, new ConfigDescription("The price of the whiteboard in the store.", new AcceptableValueRange<int>(0, 1000)));
         HostOnly = configFile.Bind("Whiteboard Settings", "HostOnly", defaultValue: false, "If enabled, only the host can edit the whiteboard.");
         DefaultDisplayText = configFile.Bind("Whiteboard Settings", "DefaultDisplayText", defaultValue: "", "The default display text that shows on the whiteboard. Supports rich text tags.");
     }

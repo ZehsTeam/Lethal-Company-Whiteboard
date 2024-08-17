@@ -15,7 +15,7 @@ public class WhiteboardBehaviour : NetworkBehaviour
     public float[] FontSizeArray = [];
     public FontStyles[] FontStyleArray = [];
     public TMP_FontAsset[] FontAssetArray = [];
-    public SpriteSheetData TakerstEmotesData = null;
+    public SpriteSheetData EmotesSpriteSheetData = null;
 
     [HideInInspector]
     public NetworkVariable<bool> IsHostOnly = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -31,6 +31,11 @@ public class WhiteboardBehaviour : NetworkBehaviour
 
     private void Start()
     {
+        if (EmotesSpriteSheetData != null)
+        {
+            WhiteboardText.spriteAsset = EmotesSpriteSheetData.SpriteAsset;
+        }
+
         if (PlayerUtils.IsLocalPlayerSpawned())
         {
             SetWorldCanvasCamera();
@@ -199,7 +204,7 @@ public class WhiteboardBehaviour : NetworkBehaviour
         Data = data;
         SaveData();
         UpdateWorldCanvas();
-        LogData();
+        LogDataExtended();
     }
     
     #region WorldCanvas
@@ -224,7 +229,14 @@ public class WhiteboardBehaviour : NetworkBehaviour
             displayText += $"<color={Data.TextHexColor}>";
         }
 
-        displayText += TakerstEmotesData.GetParsedText(Data.DisplayText);
+        if (EmotesSpriteSheetData != null)
+        {
+            displayText += EmotesSpriteSheetData.GetParsedText(Data.DisplayText);
+        }
+        else
+        {
+            displayText += Data.DisplayText;
+        }
 
         // If using the Signal Translator font, make all the text lowercase.
         if (Data.FontFamilyIndex == 2)
@@ -255,7 +267,7 @@ public class WhiteboardBehaviour : NetworkBehaviour
     }
     #endregion
 
-    private void LogData()
+    private void LogDataExtended()
     {
         string message = string.Empty;
 
